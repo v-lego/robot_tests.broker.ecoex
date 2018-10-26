@@ -456,7 +456,7 @@ Login
 Завантажити документ в тендер з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${doc_type}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  ecoex.Завантажити документ до форми з типом  ${username}  ${tender_uaid}  ${filepath}  illustration
+  ecoex.Завантажити документ до форми з типом  ${username}  ${tender_uaid}  ${filepath}  ${doc_type}
 
 Завантажити документ до форми з типом
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${doc_type}
