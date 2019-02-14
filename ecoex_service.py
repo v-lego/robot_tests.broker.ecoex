@@ -2,7 +2,6 @@
 import pytz
 import dateutil.parser
 import urllib
-import re
 
 from datetime import datetime
 from robot.libraries.BuiltIn import BuiltIn
@@ -15,14 +14,17 @@ def is_checked(locator):
     driver = get_webdriver()
     return driver.find_element_by_id(locator).is_selected()
 
-def get_str(value):
-    return str(value)
+def get_tender_dates(initial_tender_data, key):
+    data_period = initial_tender_data.data.auctionPeriod
+    start_dt = dateutil.parser.parse(data_period['startDate'])
+    data = {
+        'StartDate': start_dt.strftime("%d.%m.%Y"),
+        'StartTime': start_dt.strftime("%H:%M"),
+    }
+    return data.get(key, '')
 
 def convert_ISO_DMY(isodate):
     return dateutil.parser.parse(isodate).strftime("%d.%m.%Y")
-
-def convert_ISO_HM(isodate):
-    return dateutil.parser.parse(isodate).strftime("%H:%M")
 
 def convert_date(isodate):
     return datetime.strptime(isodate, '%d.%m.%Y').date().isoformat()
@@ -50,16 +52,13 @@ def is_eligible(tender_data):
         return  tender_data['data']['eligible']
     return False
 
+def bid_value(tender_data):
+    if 'value' in tender_data['data']:
+        return  str(tender_data['data']['value']['amount'])
+    return ''
+
 def download_file(url, file_name, output_dir):
     urllib.urlretrieve(url, ('{}/{}'.format(output_dir, file_name)))
 
 def inc(value):
     return int(value) + 1
-
-def convert_iso8601Duration(duration):
-   if duration == u'P1M':
-    duration = u'P30D'
-   dayDuration = re.search('\d+D|$', duration).group()
-   if len(dayDuration) > 0:
-    dayDuration = dayDuration[:-1]
-   return dayDuration
