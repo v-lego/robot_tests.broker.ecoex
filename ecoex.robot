@@ -528,14 +528,14 @@ Login
 
 Подати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  ${bid_data}
-  ${amount}=  Convert To String  ${bid_data.data.value.amount}
   ${is_qualified}=  is_qualified  ${bid_data}
   ${is_eligible}=  is_eligible  ${bid_data}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   Wait Until Element Is Visible  xpath=(//*[@id='btnBid']) 
   Click Element  id=btnBid
   Wait Until Element Is Visible  xpath=(//*[@id='bid_load_status']) 
-  Run Keyword If  '${amount}' != ''  Input Text  id=eBid_price  ${amount}
+  ${present}=  Run Keyword And Return Status  Element Should Be Visible  id=eBid_price
+  Run Keyword If  ${present}  ecoex.Введення ціни пропозиії  ${bid_data}
   Run Keyword If  ${is_qualified}  Click Element  id=lcbBid_selfQualified
   Run Keyword If  ${is_eligible}  Click Element  id=lcbBid_selfEligible
   Click Element  id=btn_save
@@ -544,6 +544,12 @@ Login
   sleep  1
   ${resp}=  Get Value  id=eBid_price
   [return]  ${resp}
+
+Введення ціни пропозиії  
+  [Arguments]  ${bid_data}
+  ${amount}=  Get From Dictionary  ${bid_data.data.value}  amount
+  ${amount}=  Convert To String  ${amount}
+  Input Text  id=eBid_price  ${amount}
 
 Скасувати цінову пропозицію
   [Arguments]  ${username}  ${tender_uaid}  
@@ -626,7 +632,7 @@ Login
   ...  ${ARGUMENTS[2]} ==  ${lot_id} for multilot request in auction stage
   Switch Browser  ${BROWSER_ALIAS}
   Wait Until Element Is Visible  xpath=(//*[@id='aPosition_auctionUrl'])
-  ${result} =  Get Text  id=aPosition_auctionUrl
+  ${result} =  Get Element Attribute  id=aPosition_auctionUrl@href
   [return]  ${result}
 
 Отримати посилання на аукціон для учасника
@@ -637,7 +643,7 @@ Login
   ...  ${ARGUMENTS[2]} ==  ${lot_id} for multilot request in auction stage
   Switch Browser  ${BROWSER_ALIAS}
   Wait Until Element Is Visible  xpath=(//*[@id='aPosition_auctionUrl'])
-  ${result}=  Get Text  id=aPosition_auctionUrl
+  ${result}=  Get Element Attribute  id=aPosition_auctionUrl@href
   [return]  ${result}
 
 Завантажити документ в тендер з типом
@@ -797,20 +803,6 @@ Login
   Wait Until Element Contains  id=tFileMessage  Файл завантажено 
   Reload Page
 
-Завантажити протокол аукціону
-  [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
-  ${award_index}=  inc  ${award_index}
-  ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  Wait Until Element Is Visible  xpath=(//*[@id='btnShowBid'])
-  Click Element  id=btnShowBid
-  Wait Until Element Is Visible  xpath=(//*[@id='btn_documents_add'])
-  Click Element  id=btn_documents_add
-  Select From List By Value  id=slFile_documentType  auctionProtocol
-  Choose File  xpath=(//*[@id='upload_form']/input[2])  ${filepath}
-  Sleep  2
-  Click Element  id=upload_button
-  Wait Until Element Contains  id=tFileMessage  Файл завантажено 
-
 Завантажити угоду до тендера
   [Arguments]  ${username}  ${tender_uaid}  ${contract_num}  ${filepath}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
@@ -831,7 +823,7 @@ Login
   Click Element  xpath=(//div[contains(@id, 'pn_control_contract')][1]//span[contains(@class, 'contract_register')])
   Wait Until Page Contains  Публікацію виконано
 
-Завантажити протокол аукціону в авард
+Завантажити протокол аукціону
   [Arguments]  ${username}  ${tender_uaid}  ${filepath}  ${award_index}
   ${award_index}=  inc  ${award_index}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
