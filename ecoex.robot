@@ -721,6 +721,7 @@ Login
   [Arguments]  ${username}  ${tender_uaid}  ${item}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
   ${index}=  ecoex.Отримати кількість предметів в тендері  ${username}  ${tender_uaid}
+  Wait Until Element Is Visible  id=btn_items_add
   ${ItemAddButtonVisible}=  Page Should Contain Element  id=btn_items_add
   Run Keyword If  '${ItemAddButtonVisible}'=='PASS'  Run Keywords
   ...  Додати предмет  ${item}  ${index}
@@ -777,7 +778,7 @@ Login
   [Arguments]  ${username}  ${tender_uaid}  ${award_index}
   ${award_index}=  inc  ${award_index}
   ecoex.Пошук тендера по ідентифікатору  ${username}  ${tender_uaid}
-  Wait Until Page Contains Element  xpath=(//*[@id='pnAwardList']/div[${award_index}]//*[contains(@class, 'award_button')])
+  Wait Until Element Is Visible  xpath=(//*[@id='pnAwardList']/div[${award_index}]//*[contains(@class, 'award_button')])
   Sleep  1
   Click Element  xpath=(//*[@id='pnAwardList']/div[${award_index}]//*[contains(@class, 'award_button')])
   Wait Until Page Contains  Публікацію виконано
@@ -848,4 +849,9 @@ Login
   ${index}=  inc  ${index}
   Wait Until Element Is Visible  xpath=(//span[contains(@class, 'rec_award_status')])[${index}]
   ${return_value}=  Get text  xpath=(//span[contains(@class, 'rec_award_status')])[${index}]
+  [return]  ${return_value}
+
+Отримати інформацію про contracts[${index}].datePaid
+  ${return_value}=  Get text  id=t_contract_0_datePaid
+  ${return_value}=  convert_date_time_to_iso  ${return_value}
   [return]  ${return_value}
