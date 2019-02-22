@@ -855,3 +855,9 @@ Login
   ${return_value}=  Get text  id=t_contract_0_datePaid
   ${return_value}=  convert_date_time_to_iso  ${return_value}
   [return]  ${return_value}
+
+Отримати інформацію про contracts[${index}].status
+  ${index}=  inc  ${index}
+  Wait Until Element Is Visible  xpath=(//span[contains(@class, 'contract_status')])[${index}]
+  ${return_value}=  Get text  xpath=(//span[contains(@class, 'contract_status')])[${index}]
+  [return]  ${return_value}
